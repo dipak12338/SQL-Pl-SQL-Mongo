@@ -1,0 +1,37 @@
+#Procedure to indert data into Database tables from .xml/.csv file.
+
+
+create or replace procedure load_a_file( p_id in number, p_filename in varchar2 )  as
+l_clob clob;
+l_bfile bfile;
+begin
+insert into demo values ( p_id, empty_clob())
+returning theClob into l_clob;
+l_bfile := bfilename( 'USER_DIR', p_filename );
+dbms_lob.fileopen( l_bfile );
+dbms_lob.loadfromfile( l_clob, l_bfile,dbms_lob.getlength( l_bfile ) );
+dbms_lob.fileclose( l_bfile );
+end;
+======================================================================================
+# SQL Block 
+
+
+DECLARE
+L_BFILE BFILE;
+L_CLOB  CLOB;
+file_name VARCHAR2(300);
+BEGIN
+   file_name := 'index.txt';
+   L_BFILE := BFILENAME('USER_DIR', file_name);
+   if (dbms_lob.fileexists(l_bfile) = 1) then
+      INSERT INTO demo 
+      VALUES (1,file_name,'Dipak','Harinkhede') return theClob into L_CLOB;
+      L_BFILE := BFILENAME('USER_DIR', file_name);
+      DBMS_LOB.FILEOPEN(L_BFILE, DBMS_LOB.FILE_READONLY);
+      DBMS_LOB.LOADFROMFILE(L_CLOB, L_BFILE, DBMS_LOB.GETLENGTH(L_BFILE));
+      DBMS_LOB.FILECLOSE(L_BFILE);
+      COMMIT;
+   end if;   
+END;
+
+
