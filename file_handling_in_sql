@@ -1,0 +1,166 @@
+
+# File Handling in SQL
+# Import the data from SQL Database to .csv/.xml file
+
+
+
+conn / as sysdba
+CREATE DIRECTORY USER_DIR AS '/appl/demo';
+
+--drop directory USER_DIR;
+
+GRANT READ,write,execute ON DIRECTORY USER_DIR TO PUBLIC;
+GRANT WRITE ON DIRECTORY USER_DIR TO PUBLIC;
+GRANT EXECUTE ON UTL_FILE TO PUBLIC; 
+
+================
+
+select * from SYS.all_directories;
+select * from dba_directories where directory_name = 'USER_DIR';
+select * from v$version;
+host dir 'USER_DIR'
+host
+C:\Users\DIPAK_~1\AppData\Local\Temp>
+
+================
+
+(login as virtuo in linux)
+# sqlplus virtuo/Virtuo01
+
+SQL> create table table21(id varchar2(3), name varchar2(20));
+ 
+ insert into table21 values ('101','Dipak');
+ insert into table21 values ('102','Nikhil');
+ insert into table21 values ('103','Atul');
+ insert into table21 values ('104','Sushant');
+ insert into table21 values ('105','Taufique');
+ insert into table21 values ('106','Vidya');
+ insert into table21 values ('107','Ashwini');
+
+ ===
+ 
+ 
+DECLARE 
+F SYS.UTL_FILE.FILE_TYPE;
+i integer(10);
+v_id varchar2(10);
+BEGIN
+select id into v_id from table21 where id='101';
+F := SYS.UTL_FILE.FOPEN('USER_DIR',v_id,'w');
+SYS.UTL_FILE.PUT(F,v_id);
+SYS.UTL_FILE.FCLOSE(F);
+END;
+
+=
+Output:
+ORA-29283: invalid file operation: cannot open file [29435]
+====
+
+DECLARE 
+F SYS.UTL_FILE.FILE_TYPE;
+i integer(10);
+v_id varchar2(10);
+BEGIN
+select id into v_id from table21  where id='101';
+F := SYS.UTL_FILE.FOPEN('USER_DIR',v_id,'w');
+For i IN (select * from table21 where id=v_id)
+     Loop
+        SYS.UTL_FILE.PUT(F,i.id || ',' || i.name);
+    End Loop;
+ SYS.UTL_FILE.FCLOSE(F);
+ END;
+
+==
+
+Output:
+ORA-29283: invalid file operation: cannot open file [29435]
+
+======================================================
+
+DECLARE 
+F SYS.UTL_FILE.FILE_TYPE;
+v_nc_id varchar2(10);
+BEGIN
+F := SYS.UTL_FILE.FOPEN('USER_DIR','NC_DATA.csv','w');
+For I IN (select cell_id into v_nc_id from nc_cell where cell_id='1-1-1-1')
+     Loop
+        dbms_output.put_line(v_nc_id);
+    End Loop;
+ SYS.UTL_FILE.FCLOSE(F);
+ END;
+ 
+same error
+
+======
+ set serveroutput on;
+ DECLARE 
+    v_id number(10);
+BEGIN
+ select id into v_id from table21 where id='101';
+      dbms_output.put_line(v_id);
+ END;
+ 
+ >working
+ 
+==============
+Here,
+
+F := UTL_FILE.FOPEN('RPT_DIR',v_report_name,'w',32767);   (file handler )
+
+-->In procedure I m not able to find location/value for 'RPT_DIR'.
+
+RPT_DIR          ->  where the file resides
+v_report_name    -> variable/.csv/.txt/ etc.
+'w'              -> mode / write or read
+32767  		     ->  (optional) max_linesize parameter must be a number in the range 1 and 32767.
+==============
+
+EXPPRECTED OUTPUT:
+Anonymous block completed.
+
+===============================================================
+
+DECLARE 
+F SYS.UTL_FILE.FILE_TYPE;
+cnt int(10):=0;
+Cursor c1 is Select * from table21;
+BEGIN
+F := SYS.UTL_FILE.FOPEN('USER_DIR','office_data.csv','w');
+For RPT1_R IN c1
+     Loop
+		UTL_FILE.PUT(F,RPT1_R.id);            
+		UTL_FILE.PUT(F,','||RPT1_R.name);             
+		UTL_FILE.NEW_LINE(F);
+		cnt := cnt + 1;
+    End Loop;
+	dbms_output.put_line('Data inserted successfully Total  = ' || cnt || ' rows insereted.');
+SYS.UTL_FILE.FCLOSE(F);
+END;
+
+
+succeeded
+================================
+
+
+
+DECLARE 
+F SYS.UTL_FILE.FILE_TYPE;
+v_nc_id varchar2(10);
+cnt int(10):=0;
+Cursor c1 is Select * from nc_cell;
+BEGIN
+F := SYS.UTL_FILE.FOPEN('USER_DIR','NC_DATA.txt','w');
+For RPT1_R IN c1
+     Loop
+        --dbms_output.put_line('v_nc_id' || v_nc_id);
+		UTL_FILE.PUT(F,RPT1_R.cell_id);
+		UTL_FILE.NEW_LINE(F);
+		cnt := cnt + 1;
+    End Loop;
+	dbms_output.put_line('Data inserted successfully Total  = ' || cnt || ' rows insereted.');
+SYS.UTL_FILE.FCLOSE(F);
+END;
+
+
+
+succeeded
