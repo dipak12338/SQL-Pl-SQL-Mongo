@@ -1,0 +1,52 @@
+# SQL procedure to load the txt file data into database table's one column only.
+
+select * from SYS.all_directories;
+select * from dba_directories where directory_name = 'USER_DIR';
+
+>         create table demo
+          ( id int primary key,
+            theClob clob
+          )
+          
+---------------------------------
+
+sqlplus / as sysdba
+CREATE DIRECTORY USER_DIR AS '/appl/dip21';
+GRANT READ,write,execute ON DIRECTORY USER_DIR TO PUBLIC;
+GRANT EXECUTE ON UTL_FILE TO PUBLIC; 
+select * from all_directories;
+
+----------------------------------
+
+sql> create or replace procedure load_a_file( p_id in number, p_filename in varchar2 )  as
+l_clob clob;
+l_bfile bfile;
+begin
+insert into demo values ( p_id, empty_clob())
+returning theClob into l_clob;
+l_bfile := bfilename( 'USER_DIR', p_filename );
+dbms_lob.fileopen(l_bfile, dbms_lob.file_readonly);
+dbms_lob.loadfromfile( l_clob, l_bfile,dbms_lob.getlength( l_bfile ) );
+dbms_lob.fileclose( l_bfile );
+end;
+ 
+sql> exec load_a_file( 1, 'index.html' );
+
+sql> select * from demo;
+
+ID THECLOB
+---------- --------------------------------------------------
+1  <html>
+   <head><title>Tom's Page</title></head>
+   
+   <body>
+   <h1>Welcome to my home page</h1>
+   
+   This web page is created by Dipak Harinkhede on 3-Feb-2023
+   
+   Thank you......
+   
+   </body>
+   </html>
+
+
