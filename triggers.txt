@@ -1,0 +1,46 @@
+TRIGGERS:
+---------
+
+A database trigger is a PL/SQL block or a PL/SQL procedure associated with a table, view, schema, or the database.
+
+It gets implicitly executed when some database-related event occurs.
+Can be applied before the instruction is executed as well as after the execution.
+
+Types of Triggers:
+---------------------
+Application Triggers	:	Fires whenever an event occurs with a particular application
+And
+Database triggers		:	Fires whenever a data event (such as DML on a table, view) or DDL(such as create, alter) or system event(such as logon, shutdown) occurs.
+
+Exaples:
+SQL> CREATE OR REPLACE TRIGGER secure_emp
+BEFORE INSERT 
+ON EMPLOYEE
+BEGIN 
+IF (TO_CHAR(SYSDATE,'DY') = ('SAT','SUN')) OR (TO_CHAR(SYSDATE,'HH24:MI') NOT BETWEEN '08:00' AND '18:00') THEN
+Raise_application_Error (-20500,'You may insert only during business hours’);
+END IF;
+END;
+
+
+The above trigger will not insert data into table during holidays. Ex. Saturday and Sunday. 
+If added then it will raise exception based on DML commands.
+
+
+----------------
+
+SQL> Create or replace trigger secure_emp
+before insert or update or delete on Employee
+begin
+if (to_char(sysdate,'DY') in ('SAT','SUN’)) Then
+If INSERTING Then
+Raise_application_error(-20502,'you may insert only during business working days’);
+ELSIf DELETING Then
+Raise_application_error(-20503,'you may delete only during business working days’);
+ELSIf UPDATING('salary') Then
+Raise_application_error(-20504,'you may update salary only during business working days’);
+Else 
+Raise_application_error(-20505,'you may update data only during business working days’);
+End if;
+End if;
+end;
