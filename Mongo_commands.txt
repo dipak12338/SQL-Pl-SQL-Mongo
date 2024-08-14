@@ -1,0 +1,214 @@
+Show All Databases:
+""""""""""""""""""""
+
+show dbs
+
+
+Create / Change Database:
+""""""""""""""""
+
+use MyDatabase
+
+
+Drop Database:
+""""""""""""""
+
+use MyDatabase
+
+db.dropDatabase()
+
+Create Collection:
+""""""""""""""""""
+
+db.createCollection("Collection_name")
+
+Drop Collection:
+""""""""""""""""
+
+db.collection_name.drop()
+
+Show collections:
+""""""""""""""""
+
+show collections
+
+Create Collection:
+""""""""""""""""""
+
+db.createCollection("Student", { capped:true, size:100000, max:100}, {autoIndexId:false})
+
+
+db.createCollection("MyCollection21")
+
+
+
+Insert into Collection:
+"""""""""""""""""""""""
+
+Insert document/records in collection:
+
+db.Students.insertOne({name:"Sham", age:30,phone: 7876453245})
+db.students.find()
+db.students.insertMany([{name: "Ram",age:25, phone:7654321674},
+			{name: "Raju", age:34,phone:7654321765},
+			{name: "Babubhaiya", age:43,phone:7654327890}]
+		      )
+
+db.students.insertOne({name:"Lav", age:32, gender: "Male", 
+			FTE: True, 				
+			regDt: new date(),
+			graduate: null,
+			courses: ["Chemistry","Biology","Maths"]})
+			address: {street: "Ward no 1, Gurugram, Delhi"}
+		      })
+
+
+
+Select in Collection:
+"""""""""""""""""""""
+
+db.students.find()
+db.students.find().pretty()
+db.students.find().short({name:-1})		--Descending order
+db.students.find().short({name:1})		--Ascending order
+ 
+db.students.find().limit(1)			 
+
+shows only one record.
+
+db.students.find().short({age:1}).limit(1)    			-- lowest age
+
+db.students.find({name: "Dipak", {age:23})	 		-- like where clause in SQL
+
+db.students.find({Query}, {Projection})				-- where clause and selected columns
+
+db.students.find({}, {name:true})				-- Return every document but only Name
+	
+db.students.find({}, {_id:true, name:true})  			-- return every document but only ID and Name
+
+
+Query Operator:
+""""""""""""""
+
+db.students.find({name:{$ne:"Ram"}})				-- select name from table where name != Ram
+
+db.students.find({age:{$gte:23}})
+
+db.students.find({age:{$gte:27}})
+
+db.students.find({age:{$gt:18, $lt:60}})			-- in Between
+
+db.students.find({name:{$in:["Raj","Anil","Rishi"]}})		-- IN operator
+
+db.students.find({name: {$nin:["Lav","Ramin"]}})		-- NOT IN
+
+db.students.find({$and:[{FTE:true},{age:{$gte:23}}]})		-- Logical AND
+
+db.students.find({$or: [{FTE:true},{age:{$gte:23}}]})
+
+db.students.find({age: {$not:{$gte:30}}})
+
+
+Evaluation:
+"""""""""""
+The following operators assist in evaluating documents.
+
+$regex : Allows the use of regular expressions when evaluating field values
+$text  : Performs a text search
+$where : Uses a JavaScript expression to match documents
+
+Fields:
+"""""""""
+The following operators can be used to update fields:
+
+$currentDate: Sets the field value to the current date
+$inc: Increments the field value
+$rename: Renames the field
+$set: Sets the value of a field
+$unset: Removes the field from the document
+
+
+Array:
+""""""
+The following operators assist with updating arrays.
+
+$addToSet: Adds distinct elements to an array
+$pop: Removes the first or last element of an array
+$pull: Removes all elements from an array that match the query
+$push: Adds an element to an array
+
+
+
+$group:				db.students.aggregate([{$group : { _id : "name"}}])
+$limit:				db.students.aggregate([{$limit: 1}])
+$project			db.students.aggregate([{$project: {"name":1, "age":1, }}, {$limit:3}])
+$sort				db.students.aggregate([{$sort:{"age":-1}}, {$project: {"name":1, "phone": 1}} , {$limit:3}])
+$addFields
+$count				db.students.aggregate([{$count: {$match: {"name" : "Dipak"}}, $count: "Total Count"}])
+$lookup
+$out
+
+
+Updating the Records:
+"""""""""""""""""""""""
+
+syntax:
+
+db.students.updateOne(filter, update)
+
+db.students.updateOne({name: "Ram"}, {$set:{age: 23}})      -- Update the age=23 where name=Ram
+
+db.Students.updateOne({name: "Ram"} , {$unset:{FTE: ""}})    -- FTE will removed from record
+
+
+db.Students.updateMany({}, {$set: {FTE: false }}) 		--everybody FTE is false
+
+db.students.updateMany({FTE:{$exists:false}}, {$set:{FTE: true}})    -- update FTE=true where FTE=false
+
+
+NOTE: If you would like to insert the document if it is not found, you can use the upsert option.
+
+
+db.stundents.updateOne({ name: "Pratik" },{$set: {age:22, phone:9876543215,FTE: false},{upsert: true})
+	
+
+Update likes on all documents by 1. For this we will use the $inc (increment) operator:
+
+db.students.updateMany({}, { $inc: { _id: 1 } })
+
+
+
+
+Deletion in MongoDB:
+""""""""""""""""""""
+
+
+db.students.deleteOne({name: "Ram"})				--delete where name=Ram
+
+db.students.deleteMany({FTE: True})
+
+db.students.deleteMany({regDt: {$exists:false}})		--delete from Students where regDt=null
+
+
+
+
+Indexing/Search:
+"""""""""""""""""
+
+
+
+Validation:
+"""""""""""
+We use validation during creating collection.
+The $jsonSchema operator allows us to define our document structure.
+
+
+
+
+
+db.createCollection("Pinnacle",{validator: {$jsonSchema: {bsonType: "object",  required: ["srno","name"],
+			 properties:
+			{srno: {bsonType: "string", description: "This is the Serial Number of Employee"},
+			{name: {bsonType: "string", description: "This is the Name of Employee"}
+  }    }}})
+
