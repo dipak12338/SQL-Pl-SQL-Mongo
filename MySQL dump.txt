@@ -1,0 +1,33 @@
+-- commands to dump the data of table with month range
+
+Go to Source server from where you needs to take dump
+
+mysqldump -u root -p database_name ezb_message_sent_master --where="dates BETWEEN '2025-01-01 00:00:00' AND '2025-01-31 23:59:59'" | sed 's/ENGINE=InnoDB/ENGINE=MyISAM/I' > ezb_message_sent_master_012025.sql
+
+Go to => destination server
+
+gunzip  ezb_message_sent_master_012025.sql.gz > /home/user/test/ezb_message_sent_master_012025.sql
+
+
+mysql -u root -p  database_name < ezb_message_sent_master_012025.sql                                  
+
+
+-- command to change the engine
+
+
+Alter table <<tablename>> engine = MyISAM;
+
+show general variables like 'general%'
+
+
+
+
+
+
+
+
+
+
+
+
+
