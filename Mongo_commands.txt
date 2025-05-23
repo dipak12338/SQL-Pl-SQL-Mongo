@@ -203,9 +203,6 @@ We use validation during creating collection.
 The $jsonSchema operator allows us to define our document structure.
 
 
-
-
-
 db.createCollection("Pinnacle",{validator: {$jsonSchema: {bsonType: "object",  required: ["srno","name"],
 			 properties:
 			{srno: {bsonType: "string", description: "This is the Serial Number of Employee"},
