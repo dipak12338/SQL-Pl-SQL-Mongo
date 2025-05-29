@@ -1,5 +1,5 @@
 # SQL procedure to load the txt file data into database table's one column only.
-
+ 
 select * from SYS.all_directories;
 select * from dba_directories where directory_name = 'USER_DIR';
 
