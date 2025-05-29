@@ -71,7 +71,7 @@ For i IN (select * from table21 where id=v_id)
  END;
 
 ==
-
+ 
 Output:
 ORA-29283: invalid file operation: cannot open file [29435]
 
