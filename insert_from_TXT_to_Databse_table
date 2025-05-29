@@ -16,3 +16,4 @@ dbms_lob.freetemporary(L_CLOB);
 Exception when others then 
 raise;
 END;
+ 
